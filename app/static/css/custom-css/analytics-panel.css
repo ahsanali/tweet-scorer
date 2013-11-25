@@ -1,0 +1,44 @@
+.genreport-margin {
+    margin-top: 23px;
+}
+
+.rangeslct-margin {
+    margin-top: 17px;
+}
+
+.center-align{
+    margin: 0 auto;
+}
+
+.rounded-box{
+    border: 1px solid #eeeeee;
+    border-radius: 5px;
+    background-color: #F7F5FA;
+}
+
+.paddingbottom-20{
+    padding-bottom: 20px;
+}
+
+.margintop-10 {
+    margin-top: 10px;
+}
+
+.margintop-15{
+    margin-top: 15px;
+}
+.margintop-20 {
+    margin-top: 20px;
+}
+
+.margintop-25 {
+    margin-top: 25px;
+}
+
+.margintop-30{
+    margin-top: 30px;
+}
+
+.bg-grey{
+    background-color: #F7F5FA;
+}

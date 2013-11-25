@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pring System Status</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Bootstrap -->
+        <link href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet" media="screen">
+        <!-- third party plugins -->
+        <link href="{{ url_for('static', filename='css/custom-styles.css') }}" rel="stylesheet">
+    </head>
+
+    <body style="margin-bottom: 100px;">
+
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+            <div class="col-md-1">
+            </div>
+
+            <div class="col-md-10 pull-left">
+                <a class="navbar-brand" href="#">Slow Twitter Client</a>
+                {% if g.user %}
+					<a href="{{ url_for('logout') }}" style="margin-top: 10px; margin-right: 20px;" class="pull-right btn btn-sm btn-info">Logout</a>
+				{% else %}
+					<a href="{{ url_for('login') }}" class="pull-right" style="margin-top: 10px;"><img src="{{ url_for('static', filename='images/sign_in.png') }}"></a>
+				{% endif %}
+                
+            </div>
+
+            <div class="col-md-1">
+            </div>
+
+        </nav>
+
+        {% for message in get_flashed_messages() %}
+			<p class=message>{{ message }}
+		{% endfor %}
+
+		{% block body %}{% endblock %}
+
+		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+    </body>
+
+</html>
