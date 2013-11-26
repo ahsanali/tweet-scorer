@@ -1,6 +1,7 @@
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 
+from operator import itemgetter
 from app import app, db, lm, oauth, twitter
 
 from models import User, Tweets
@@ -106,7 +107,7 @@ def index():
             if fav_resp.status == 200:
                 timeline_resp = twitter.request('statuses/user_timeline.json', data={ 'screen_name': user_info['screen_name']})
                 if timeline_resp.status == 200:
-                    score_prob_star(tweets=tweet_temp, favorite_tweets=fav_resp.data, user_tweets=timeline_resp.data)
+                    tweet_temp = score_prob_star(tweets=tweet_temp, favorite_tweets=fav_resp.data, user_tweets=timeline_resp.data)
         else:
             flash('Unable to load tweets from Twitter.')
 
@@ -192,14 +193,15 @@ def score_prob_star(tweets, favorite_tweets, user_tweets):
     i = 0
     scored_tweets = []
 
-    for tweet in tweets:
-        tweet_user = tweet['user']['screen_name']
+    for i in range(0,len(tweets)):
+        tweet_user = tweets[i]['user']['screen_name']
         temp = user_tweets_stared_by_current_user(tweet_user=tweet_user, favorite_tweets=favorite_tweets)
         score = assign_score(tweets=tweets, starred_tweets=temp, user_tweets=user_tweets)
         
         # put the result from score algo here...
         tweets[i]['score'] = score
-        sorted_tweets = sorted(tweets, key=itemgetter('score'), reverse=True)
+    print tweets[2]
+    sorted_tweets = sorted(tweets, key=itemgetter('score'), reverse=True)
     return sorted_tweets
 
 def pull_tweets(last_id):
