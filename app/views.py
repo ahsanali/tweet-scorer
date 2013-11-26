@@ -199,8 +199,8 @@ def score_prob_star(tweets, favorite_tweets, user_tweets):
         
         # put the result from score algo here...
         tweets[i]['score'] = score
-        
-    return tweets
+        sorted_tweets = sorted(tweets, key=itemgetter('score'), reverse=True)
+    return sorted_tweets
 
 def pull_tweets(last_id):
     resp = twitter.request('statuses/home_timeline.json', data={ 'count': 200, 'max_id': last_id})
