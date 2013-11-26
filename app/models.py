@@ -22,7 +22,17 @@ class User(db.Model):
     def is_anonymous(self):
       return False
 
-
-
     def __repr__(self):
         return '<ID %r, Name %r, Last_Seen %r>' % (self.id, self.name, self.last_seen)
+
+class Tweets(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer)
+    created_by = db.Column(db.String(200))
+    date_created = db.Column(db.String(200))
+
+    def __repr__(self):
+        return '<IDs %r>' % (self.created_by)
+
+
+    

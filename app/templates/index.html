@@ -3,29 +3,6 @@
 
 <div class="container" style="margin-top: 150px;">
   {% if g.user %}
-    <div class="row">
-      <div class="col-md-2">
-      </div>
-
-      <div class="col-md-10">
-          <div class="row">
-
-              <div class="col-md-2">
-                  <img src="{{ user_info.profile_image_url }}" class="img-thumbnail pull-right" style="width: 73px; height: 73px;">
-              </div>
-
-              <div class="col-md-10 pull-left">
-                  <h4>{{ user_info.name }}</h4>
-                  <p>@{{ user_info.screen_name }}</p>
-                  <p><i>{{ user_info.description }}</i></p>
-              </div>
-
-          </div>
-      </div>
-      <div class="col-md-2">
-      </div>
-    </div>
-    <hr />
     {% if tweets %}
             <div class="row" style="margin-top: 25px;">
 
@@ -55,6 +32,8 @@
                         <div class="media-body">
                             <a href="http://twitter.com/{{ tweet.user.screen_name }}"><h4 class="media-heading">{{ tweet.user.screen_name }}</h4></a>
                             {{ tweet.text|urlize }}
+                            <br />
+                            <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id_str }}" target="_blank">Detail</a>
                             <br />
                             {% if tweet.score %}
                               (Tweet Score: {{ tweet.score }})

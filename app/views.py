@@ -3,10 +3,10 @@ from flask.ext.login import login_user, logout_user, current_user, login_require
 
 from app import app, db, lm, oauth, twitter
 
-from models import User
+from models import User, Tweets
 
 from random import randint
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 @twitter.tokengetter
@@ -42,23 +42,71 @@ def index():
         if get_user.status == 200:
             user_info = get_user.data
 
-        resp = twitter.request('statuses/home_timeline.json')
+        resp = twitter.request('statuses/home_timeline.json', data={ 'count': 200})
         
         if resp.status == 200:
+
+            # to store in database to generate home timeline
+            user = User.query.filter_by(name=user_info['screen_name']).first()
+            temp_tweets = resp.data
+
+            if user.last_seen is None:
+                
+
+                for tweet in temp_tweets:
+                    # minus 7 days from current time
+                    current_date = datetime.utcnow()
+                    previous_date = current_date - timedelta(days=7)
+                    tweet_time = datetime.utcnow().strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
+                    
+                    if tweet_time > previous_date:
+                        t = Tweets(user_id=user_info['id'], created_by=tweet['user']['screen_name'], date_created=tweet['created_at'])
+                        db.session.add(t)
+                        db.session.commit()
+
+                    else:
+                        break
+            else:
+   
+                for tweet in temp_tweets:
+                    tweet_time = datetime.utcnow().strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
+                    if tweet_time > user.last_seen:
+                        t = Tweets(user_id=user_info['id'], created_by=tweet['user']['screen_name'], date_created=tweet['created_at'])
+                        db.session.add(t)
+                        db.session.commit()
+
+
             tweets = resp.data
             tweet_temp = []
+            temp_tweets = resp.data
 
-            for tweet in tweets:
-                tweet_time = datetime.utcnow().strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
-                user = User.query.filter_by(name=user_info['screen_name']).first()        
-                if user.last_seen is None:
-                    tweet_temp.append(tweet)
-
-                elif tweet_time > user.last_seen:
-                    tweet_temp.append(tweet)
-                    time_length = datetime.utcnow() - user.last_seen
-            score_inverse_freq(tweets=tweet_temp, time_length=time_length, user_info=user_info)
-
+            # to display in timeline
+            if user.last_seen is None:
+                i = 0
+                for tweet in temp_tweets:
+                    # minus 7 days from current time
+                    current_date = datetime.utcnow()
+                    previous_date = current_date - timedelta(days=7)
+                    tweet_time = datetime.utcnow().strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
+                    
+                    if tweet_time >= previous_date:
+                        tweet_temp.append(tweet)
+                    else:
+                        break
+            else:
+                for tweet in temp_tweets:
+                    tweet_time = datetime.utcnow().strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
+                    if tweet_time > user.last_seen:
+                        tweet_temp.append(tweet)
+                        time_length = datetime.utcnow() - user.last_seen
+     
+            score_inverse_freq(time_length=time_length, user_info=user_info)
+            
+            fav_resp = twitter.request('favorites/list.json')
+            if fav_resp.status == 200:
+                timeline_resp = twitter.request('statuses/user_timeline.json', data={ 'screen_name': user_info['screen_name']})
+                if timeline_resp.status == 200:
+                    score_prob_star(tweets=tweet_temp, favorite_tweets=fav_resp.data, user_tweets=timeline_resp.data)
         else:
             flash('Unable to load tweets from Twitter.')
 
@@ -94,7 +142,7 @@ def oauthorized(resp):
 
     # user never signed in
     if user is None:
-        user = User(name=resp['screen_name'], oauth_token=resp['oauth_token'], oauth_secret=resp['oauth_token_secret'])
+        user = User(id=resp['user_id'], name=resp['screen_name'], oauth_token=resp['oauth_token'], oauth_secret=resp['oauth_token_secret'])
         db.session.add(user)
         db.session.commit()
         login_user(user)
@@ -112,14 +160,53 @@ def oauthorized(resp):
 def load_user(userid):
     return User(id = userid)
 
-@app.route('/score')
-def score_inverse_freq(tweets, time_length, user_info, frequency=None):
-    i = 0
-    for tweet in tweets:
-        tweets[i]['score'] = randint(2,30)
-        i = i+1
+def score_inverse_freq(time_length, user_info, frequency=None):
+    # "tweets" below contain the entire hometime of the logged in user starting from 7 days before the first login
+    tweets = Tweets.query.filter_by(user_id=user_info['id'])
 
-    from operator import itemgetter
-    sorted_tweets = sorted(tweets, key=itemgetter('score'), reverse=True)
+    for i in tweets:
+        # this will give u the tweet date
+        print i.date_created
+        # this will give u the user who created this tweet
+        print i.created_by
+
+    #from operator import itemgetter
+    #sorted_tweets = sorted(tweets, key=itemgetter('score'), reverse=True)
 
     return None
+
+def user_tweets_stared_by_current_user(tweet_user, favorite_tweets):
+    result = []
+    i = 0
+    for tweet in favorite_tweets:
+        if tweet_user == favorite_tweets[i]['user']['screen_name']:
+            result.append(tweet)
+        i = i+1
+    return result
+
+# assign score to single tweet according to the second algo
+def assign_score(tweets, starred_tweets, user_tweets):
+    return randint(2,30)
+
+def score_prob_star(tweets, favorite_tweets, user_tweets):
+    i = 0
+    scored_tweets = []
+
+    for tweet in tweets:
+        tweet_user = tweet['user']['screen_name']
+        temp = user_tweets_stared_by_current_user(tweet_user=tweet_user, favorite_tweets=favorite_tweets)
+        score = assign_score(tweets=tweets, starred_tweets=temp, user_tweets=user_tweets)
+        
+        # put the result from score algo here...
+        tweets[i]['score'] = score
+        
+    return tweets
+
+def pull_tweets(last_id):
+    resp = twitter.request('statuses/home_timeline.json', data={ 'count': 200, 'max_id': last_id})
+    if resp.status == 200:
+        older_tweets = resp.data
+        return older_tweets
+
+
+

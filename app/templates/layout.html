@@ -17,9 +17,10 @@
             </div>
 
             <div class="col-md-10 pull-left">
-                <a class="navbar-brand" href="#">Slow Twitter Client</a>
+                <a class="navbar-brand" href="#" style="margin-top: 5px;">Slow Twitter Client</a>
                 {% if g.user %}
-					<a href="{{ url_for('logout') }}" style="margin-top: 10px; margin-right: 20px;" class="pull-right btn btn-sm btn-info">Logout</a>
+                    <a href="{{ url_for('logout') }}" style="margin-top: 13px; margin-right: 20px;" class="pull-right btn btn-sm btn-info">Logout</a>
+                    <img src="{{ user_info.profile_image_url }}" class="img-thumbnail pull-right" style="margin-right: 20px;">
 				{% else %}
 					<a href="{{ url_for('login') }}" class="pull-right" style="margin-top: 10px;"><img src="{{ url_for('static', filename='images/sign_in.png') }}"></a>
 				{% endif %}
