@@ -200,7 +200,7 @@ def score_prob_star(tweets, favorite_tweets, user_tweets):
         
         # put the result from score algo here...
         tweets[i]['score'] = score
-    print tweets[2]
+#    print tweets[2]
     sorted_tweets = sorted(tweets, key=itemgetter('score'), reverse=True)
     return sorted_tweets
 
