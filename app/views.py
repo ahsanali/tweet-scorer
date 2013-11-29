@@ -9,6 +9,7 @@ from models import User, Tweets
 from random import randint
 from datetime import datetime, timedelta
 
+from collections import Counter
 
 @twitter.tokengetter
 def get_twitter_token():
@@ -192,12 +193,16 @@ def assign_score(tweets, starred_tweets, user_tweets):
 def score_prob_star(tweets, favorite_tweets, user_tweets):
     i = 0
     scored_tweets = []
+    tweet_freq = Counter()
+    for i in range(0,len(tweets)):
+       tweet_user = tweets[i]['user']['screen_name']
+       tweet_freq[tweet_user] += 1
 
     for i in range(0,len(tweets)):
         tweet_user = tweets[i]['user']['screen_name']
         temp = user_tweets_stared_by_current_user(tweet_user=tweet_user, favorite_tweets=favorite_tweets)
-        score = assign_score(tweets=tweets, starred_tweets=temp, user_tweets=user_tweets)
-        
+        #score = assign_score(tweets=tweets, starred_tweets=temp, user_tweets=user_tweets)
+        score = 1./tweet_freq[tweet_user]
         # put the result from score algo here...
         tweets[i]['score'] = score
 #    print tweets[2]
