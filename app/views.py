@@ -54,7 +54,6 @@ def index():
 
             if user.last_seen is None:
                 
-
                 for tweet in temp_tweets:
                     # minus 7 days from current time
                     current_date = datetime.utcnow()
@@ -193,18 +192,25 @@ def assign_score(tweets, starred_tweets, user_tweets):
 def score_prob_star(tweets, favorite_tweets, user_tweets):
     i = 0
     scored_tweets = []
+    scored_tweets2 = []
     tweet_freq = Counter()
     for i in range(0,len(tweets)):
        tweet_user = tweets[i]['user']['screen_name']
        tweet_freq[tweet_user] += 1
+    star_freq = Counter()
+    for i in range(0,len(favorite_tweets)):
+       tweet_user = favorite_tweets[i]['user']['screen_name']
+       star_freq[tweet_user] += 1
 
     for i in range(0,len(tweets)):
         tweet_user = tweets[i]['user']['screen_name']
         temp = user_tweets_stared_by_current_user(tweet_user=tweet_user, favorite_tweets=favorite_tweets)
         #score = assign_score(tweets=tweets, starred_tweets=temp, user_tweets=user_tweets)
         score = 1./tweet_freq[tweet_user]
+        score2 = (1.*star_freq[tweet_user])/tweet_freq[tweet_user]
         # put the result from score algo here...
         tweets[i]['score'] = score
+        tweets[i]['score2'] = score2
 #    print tweets[2]
     sorted_tweets = sorted(tweets, key=itemgetter('score'), reverse=True)
     return sorted_tweets
