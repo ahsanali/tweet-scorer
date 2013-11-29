@@ -51,8 +51,8 @@ def index():
             # to store in database to generate home timeline
             user = User.query.filter_by(name=user_info['screen_name']).first()
             temp_tweets = resp.data
-
-            if user.last_seen is None:
+            
+            if True:#user.last_seen is None:
                 
                 for tweet in temp_tweets:
                     # minus 7 days from current time
@@ -82,7 +82,7 @@ def index():
             temp_tweets = resp.data
 
             # to display in timeline
-            if user.last_seen is None:
+            if True:#user.last_seen is None:
                 i = 0
                 for tweet in temp_tweets:
                     # minus 7 days from current time
