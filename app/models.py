@@ -9,6 +9,7 @@ class User(db.Model):
     oauth_token = db.Column(db.String(200))
     oauth_secret = db.Column(db.String(200))
     last_seen = db.Column(db.DateTime)
+    last_tweet_id = db.Column(db.String(100))
 
     def get_id(self):
       return self.id
