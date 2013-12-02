@@ -51,21 +51,18 @@ def index():
         get_user = twitter.request('users/show.json', data={'screen_name': user_info['screen_name']})
         if get_user.status == 200:
             user_info = get_user.data
-
-        for i in range(0,3):
+        for i in range(0,5):
             data = { 'count': 200}
             # if last_tweet_id is not None:
             #     data.append({'max_id':last_tweet_id})
             if temp_tweet_id is not None:
-                data.update({'since_id':temp_tweet_id})
+                data.update({'max_id':temp_tweet_id})
             resp = twitter.request('statuses/home_timeline.json', data=data)
             # if temp_tweet_id is None:
             #     set_last_tweet_id = resp.data[1].id_str
             #     print "Recent Most Tweet: %s"% set_last_tweet_id
-            print resp.data
             print resp.status
             temp_tweet_id = resp.data[-1]['id_str']
-            print resp.data[-1]['id_str']
             tweets.extend(resp.data)
             if resp.status == 200:
                 temp_tweets = resp.data               
@@ -78,6 +75,10 @@ def index():
         # db.add(user)
         # db.session.commit()
 
+        # for t in tweets:
+        #     f.write(t['id_str']+"\n")
+
+
         # tweets = 
         tweet_temp = []
         temp_tweets = tweets
@@ -89,9 +90,9 @@ def index():
                 # minus 7 days from current time
                 current_date = datetime.utcnow()
                 previous_date = current_date - timedelta(days=7)
-                tweet_time = datetime.utcnow().strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
-                
+                tweet_time = datetime.utcnow().strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')  
                 if tweet_time >= previous_date:
+                    
                     tweet_temp.append(tweet)
                 else:
                     break
@@ -140,12 +141,9 @@ def oauthorized(resp):
     else:
         session['twitter_oauth'] = resp
     user = User.query.filter_by(name=resp['screen_name']).first()
-    print "here out side"
     # user never signed in
     if user is None:
         user = User(id=resp['user_id'], name=resp['screen_name'], oauth_token=resp['oauth_token'], oauth_secret=resp['oauth_token_secret'])
-        print "here"
-        print user
         db.session.add(user)
         db.session.commit()
         login_user(user)
@@ -213,7 +211,6 @@ def score_prob_star(tweets, favorite_tweets, user_tweets, criteria):
         # put the result from score algo here...
         tweets[i]['score'] = score
         tweets[i]['score2'] = score2
-#    print tweets[2]
     sorted_tweets = sorted(tweets, key=itemgetter(criteria), reverse=True)
     return sorted_tweets
 
