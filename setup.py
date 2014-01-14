@@ -28,7 +28,8 @@ setup(
         'flask-babel==0.8',
         'flup',
         'Flask-OAuthlib',
-        'Flask-Script'
+        'Flask-Script',
+        'tornado'
 
     ],
     classifiers=[
