@@ -2,6 +2,7 @@ from celery import Celery
 from app import db,models
 from twitter import Twitter, OAuth, TwitterHTTPError
 from datetime import datetime, timedelta
+import logging
 import json
 
 celery = Celery('tasks')
@@ -16,7 +17,7 @@ def job(x, y):
 	users = models.User.query.all()
 	for (index , user) in enumerate(users):
 		try:
-			print "Starting Job For User:" + user.name
+			logging.info("\nStarting Job For User:" + user.name)
 			set_last_tweet_id = user.last_tweet_id
 			temp_tweet_id = None
 			twitterHandler = Twitter(auth=OAuth(user.oauth_token, user.oauth_secret,CONSUMER_KEY, CONSUMER_SECRET))
@@ -25,10 +26,9 @@ def job(x, y):
 				if temp_tweet_id is not None:
 					data.update({'max_id':temp_tweet_id})	
 				data.update({'since_id':user.last_tweet_id})
-				print "Sending Request"
-				print data
+				logging.info("Request data:%s" % data)
 				tweets=twitterHandler.statuses.home_timeline(**data)
-				print "Total Numbers of Tweets:%s" % len(tweets)
+				logging.info("\nTotal Numbers of Tweets:%s" % len(tweets))
 				if len(tweets) > 0:
 					set_last_tweet_id = tweets[0]['id_str']
 					print type(tweets[0]['id_str'])
@@ -43,9 +43,9 @@ def job(x, y):
 			user.last_tweet_id = set_last_tweet_id
 			db.session.add(user)
 			db.session.commit()
-			print "Closing job for User:" + user.name
+			logging.info("\nClosing job for User:%s" % user.name)
 		except Exception, exp:
-			print "Exception: %s" % exp
+			logging.info("Exception: %s" % exp)
 
 	
 

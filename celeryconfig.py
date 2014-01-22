@@ -7,3 +7,4 @@ CELERYBEAT_SCHEDULE = {
         'args': (1,2),
     },
 }
+CELERYD_HIJACK_ROOT_LOGGER = False
