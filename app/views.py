@@ -123,9 +123,12 @@ def logout():
 @app.route('/oauthorized')
 @twitter.authorized_handler
 def oauthorized(resp):
+
     if resp is None:
         flash('You denied the request to sign in.')
     else:
+        #Printing Responce from Twitter
+        print resp
         session['twitter_oauth'] = resp
     user = User.query.filter_by(name=resp['screen_name']).first()
     # user never signed in

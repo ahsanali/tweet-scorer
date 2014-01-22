@@ -29,7 +29,9 @@ setup(
         'flup',
         'Flask-OAuthlib',
         'Flask-Script',
-        'tornado'
+        'tornado',
+        'Celery==3.0.9',
+        'twitter==1.10.0'
 
     ],
     classifiers=[
