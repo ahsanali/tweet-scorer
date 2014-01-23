@@ -35,6 +35,4 @@ class Tweets(db.Model):
 
     def __repr__(self):
         return '<IDs %r>' % (self.created_by)
-
-
     

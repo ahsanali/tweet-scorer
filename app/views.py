@@ -30,11 +30,8 @@ def before_request():
 def index():
     tweets = []
     tweet_temp = None
-    set_last_tweet_id = None
     user_info = None
-    temp_tweet_id = None
     time_length = datetime.utcnow()
-    fmt = '%a %b %d %H:%M:%S +0000 %Y'
     criteria = request.args.get('score','score')
     if g.user is not None:
         user = User.query.filter_by(id=g.user).first()
@@ -47,39 +44,9 @@ def index():
         get_user = twitter.request('users/show.json', data={'screen_name': user_info['screen_name']})
         if get_user.status == 200:
             user_info = get_user.data
-        for i in range(0,5):
-            data = { 'count': 200}
-            if last_tweet_id is not None:
-                data.update({'since_id':last_tweet_id})
-            if temp_tweet_id is not None:
-                data.update({'max_id':temp_tweet_id})
-            f = open('tweet','w')
-            resp = twitter.request('statuses/home_timeline.json', data=data)
-            f.write(json.dumps(resp.data))
-            f.flush()
-            if resp.status == 200 and len(resp.data) > 0:
-                if temp_tweet_id is None:
-                    set_last_tweet_id = resp.data[0]['id_str']
-                    print "Recent Most Tweet: %s"% set_last_tweet_id
-                temp_tweet_id = resp.data[-1]['id_str']
-                tweets.extend(resp.data)
-                if resp.status == 200:
-                    temp_tweets = resp.data               
-                    for tweet in temp_tweets:
-                        t = Tweets(user_id=user_info['id'], created_by=tweet['user']['screen_name'], date_created=datetime.strptime(tweet['created_at'],fmt), content = json.dumps(tweet))
-                        db.session.add(t)
-                        db.session.commit()
-            else:
-                break
-
-        user.last_tweet_id = set_last_tweet_id
-        db.session.add(user)
-        db.session.commit()
-
-        tweet_temp = None
-
         # to display in timeline
         if user.last_seen is None:
+                first_login_data(user,user_info)
                 # minus 7 days from current time
                 current_date = datetime.utcnow()
                 previous_date = current_date - timedelta(days=7)
@@ -209,6 +176,37 @@ def pull_tweets(last_id):
     if resp.status == 200:
         older_tweets = resp.data
         return older_tweets
+
+def first_login_data(user,user_info):
+    tweets = []
+    set_last_tweet_id = None
+    temp_tweet_id = None
+    fmt = '%a %b %d %H:%M:%S +0000 %Y'
+    last_tweet_id = user.last_tweet_id
+    for i in range(0,5):
+        data = { 'count': 200}
+        if last_tweet_id is not None:
+            data.update({'since_id':last_tweet_id})
+        if temp_tweet_id is not None:
+            data.update({'max_id':temp_tweet_id})
+        resp = twitter.request('statuses/home_timeline.json', data=data)
+        if resp.status == 200 and len(resp.data) > 0:
+            if temp_tweet_id is None:
+                set_last_tweet_id = resp.data[0]['id_str']
+                print "Recent Most Tweet: %s"% set_last_tweet_id
+            temp_tweet_id = resp.data[-1]['id_str']
+            tweets.extend(resp.data)
+            if resp.status == 200:
+                temp_tweets = resp.data               
+                for tweet in temp_tweets:
+                    t = Tweets(user_id=user_info['id'], created_by=tweet['user']['screen_name'], date_created=datetime.strptime(tweet['created_at'],fmt), content = json.dumps(tweet))
+                    db.session.add(t)
+                    db.session.commit()
+        else:
+            break
+    user.last_tweet_id = set_last_tweet_id
+    db.session.add(user)
+    db.session.commit()
 
 
 

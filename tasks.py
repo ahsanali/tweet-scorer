@@ -13,7 +13,7 @@ CONSUMER_SECRET = 'c4uaYwUkpSYIvGUjCQAj80z8GcowPwtK896GN8BjM'
 
 
 @celery.task
-def job(x, y):
+def dump_tweet_job(x, y):
 	users = models.User.query.all()
 	for (index , user) in enumerate(users):
 		try:
@@ -24,10 +24,11 @@ def job(x, y):
 			for i in range(0,5):
 				data = { 'count': 200}
 				if temp_tweet_id is not None:
-					data.update({'max_id':temp_tweet_id})	
+					data.update({'max_id':temp_tweet_id})
 				data.update({'since_id':user.last_tweet_id})
 				logging.info("Request data:%s" % data)
 				tweets=twitterHandler.statuses.home_timeline(**data)
+				print "Dir Status %s" % dir(twitterHandler.statuses)
 				logging.info("\nTotal Numbers of Tweets:%s" % len(tweets))
 				if len(tweets) > 0:
 					set_last_tweet_id = tweets[0]['id_str']
@@ -47,5 +48,10 @@ def job(x, y):
 		except Exception, exp:
 			logging.info("Exception: %s" % exp)
 
-	
-
+# @celery.task
+# def fav_tweet_job(x,y):
+# 	users = models.User.query.all()
+# 	for (index , user) in enumerate(users):
+# 		twitterHandler = Twitter(auth=OAuth(user.oauth_token, user.oauth_secret,CONSUMER_KEY, CONSUMER_SECRET))
+# 		tweets=twitterHandler.favorites.list()
+# 		print tweets;
