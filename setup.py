@@ -30,7 +30,7 @@ setup(
         'Flask-OAuthlib',
         'Flask-Script',
         'tornado',
-        'Celery==3.0.9',
+        'Celery==3.1.8',
         'twitter==1.10.0'
 
     ],

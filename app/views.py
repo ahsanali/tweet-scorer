@@ -199,7 +199,7 @@ def first_login_data(user,user_info):
             if resp.status == 200:
                 temp_tweets = resp.data               
                 for tweet in temp_tweets:
-                    t = Tweets(user_id=user_info['id'], created_by=tweet['user']['screen_name'], date_created=datetime.strptime(tweet['created_at'],fmt), content = json.dumps(tweet))
+                    t = Tweets(tweet_id = tweet['id_str'], user_id = user_info['id'], created_by = tweet['user']['screen_name'], date_created=datetime.strptime(tweet['created_at'],fmt), content = json.dumps(tweet))
                     db.session.add(t)
                     db.session.commit()
         else:

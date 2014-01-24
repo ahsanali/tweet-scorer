@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import logging
 import json
 
-celery = Celery('tasks')
+celery = Celery('tasks', broker='amqp://guest@localhost//')
 celery.config_from_object('celeryconfig')
 
 CONSUMER_KEY = 'tqC2q3KhStpJ14H90BqNg'
@@ -28,7 +28,6 @@ def dump_tweet_job(x, y):
 				data.update({'since_id':user.last_tweet_id})
 				logging.info("Request data:%s" % data)
 				tweets=twitterHandler.statuses.home_timeline(**data)
-				print "Dir Status %s" % dir(twitterHandler.statuses)
 				logging.info("\nTotal Numbers of Tweets:%s" % len(tweets))
 				if len(tweets) > 0:
 					set_last_tweet_id = tweets[0]['id_str']
@@ -36,7 +35,7 @@ def dump_tweet_job(x, y):
 					temp_tweet_id = unicode(int(tweets[-1]['id_str']) - 1)
 					print temp_tweet_id
 					for tweet in tweets:
-						t = models.Tweets(user_id=user.id, created_by=tweet['user']['screen_name'], date_created=datetime.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y'), content = json.dumps(tweet))
+						t = models.Tweets(tweet_id = tweet['id_str'], user_id=user.id, created_by=tweet['user']['screen_name'], date_created=datetime.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y'), content = json.dumps(tweet))
 						db.session.add(t)
 						db.session.commit()
 				else:
@@ -48,10 +47,10 @@ def dump_tweet_job(x, y):
 		except Exception, exp:
 			logging.info("Exception: %s" % exp)
 
-# @celery.task
-# def fav_tweet_job(x,y):
-# 	users = models.User.query.all()
-# 	for (index , user) in enumerate(users):
-# 		twitterHandler = Twitter(auth=OAuth(user.oauth_token, user.oauth_secret,CONSUMER_KEY, CONSUMER_SECRET))
-# 		tweets=twitterHandler.favorites.list()
-# 		print tweets;
+@celery.task
+def fav_tweet_job(x,y):
+	users = models.User.query.all()
+	for (index , user) in enumerate(users):
+		twitterHandler = Twitter(auth=OAuth(user.oauth_token, user.oauth_secret,CONSUMER_KEY, CONSUMER_SECRET))
+		tweets=twitterHandler.favorites.list()
+		print tweets;

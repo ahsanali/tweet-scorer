@@ -10,7 +10,6 @@ class User(db.Model):
     oauth_secret = db.Column(db.String(200))
     last_seen = db.Column(db.DateTime)
     last_tweet_id = db.Column(db.String(100))
-
     def get_id(self):
       return self.id
 
@@ -28,6 +27,7 @@ class User(db.Model):
 
 class Tweets(db.Model):
     id = db.Column(db.Integer, primary_key = True)
+    tweet_id = db.Column(db.String(100))
     user_id = db.Column(db.Integer)
     created_by = db.Column(db.String(200))
     date_created = db.Column(db.DateTime)
@@ -35,4 +35,10 @@ class Tweets(db.Model):
 
     def __repr__(self):
         return '<IDs %r>' % (self.created_by)
+
+class FavTweets(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer)
+    tweet_id = db.Column(db.Integer)
+
     

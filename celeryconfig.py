@@ -1,9 +1,10 @@
 from celery.schedules import crontab
  
+CELERY_TIMEZONE = 'UTC'
 CELERYBEAT_SCHEDULE = {
     'dump-tweet': {
         'task': 'tasks.dump_tweet_job',
-        'schedule': crontab(minute='*/1'),
+        'schedule': crontab(minute='*/2'),
         'args': (1,2),
     },
     # 'dump-fav':{
