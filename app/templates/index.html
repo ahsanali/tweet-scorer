@@ -26,18 +26,19 @@
                 <div class="col-md-8">
                     {% for tweet in tweets %}
                     <div class="media">
-                        <a class="pull-left" href="#">
+                        <a class="pull-left" href="http://twitter.com/{{ tweet.user.screen_name }}">
                             <img class="media-object" src="{{ tweet.user.profile_image_url }}" alt="DP">
                         </a>
                         <div class="media-body">
-                            <a href="http://twitter.com/{{ tweet.user.screen_name }}"><h4 class="media-heading">{{ tweet.user.screen_name }}</h4></a>
+                            <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id_str }}"><h4 class="media-heading">{{ tweet.user.screen_name }}</h4></a>
                             {{ tweet.text|urlize }}
                             <br />
-                            <a href="https://twitter.com/{{ tweet.user.screen_name }}/status/{{ tweet.id_str }}" target="_blank">Detail</a>
                             <br />
-                            {% if tweet.score %}
-                              (Tweet Score 1 : {{ tweet.score }}  Tweet Score 2: {{ tweet.score2 }}  )
-                            {% endif %}
+                            <div style="display:none;">
+                                {% if tweet.score %}
+                                  (Tweet Score 1 : {{ tweet.score }}  Tweet Score 2: {{ tweet.score2 }}  )
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     {% endfor %}
