@@ -53,7 +53,7 @@ def fav_tweet_job(x,y):
 	users = models.User.query.all()
 	for (index , user) in enumerate(users):
 		if user.last_fav_tweet_id != None :
-			data.update{'since_id':user.last_fav_tweet_id}
+			data.update({'since_id':user.last_fav_tweet_id})
 
 		twitterHandler = Twitter(auth=OAuth(user.oauth_token, user.oauth_secret,CONSUMER_KEY, CONSUMER_SECRET))
 		tweets=twitterHandler.favorites.list(**data)
