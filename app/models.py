@@ -10,6 +10,7 @@ class User(db.Model):
     oauth_secret = db.Column(db.String(200))
     last_seen = db.Column(db.DateTime)
     last_tweet_id = db.Column(db.String(100))
+    last_fav_tweet_id = db.Column(db.String(100))
     def get_id(self):
       return self.id
 
@@ -39,6 +40,6 @@ class Tweets(db.Model):
 class FavTweets(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     user_id = db.Column(db.Integer)
-    tweet_id = db.Column(db.Integer)
+    tweet_id = db.Column(db.String(100))
 
     

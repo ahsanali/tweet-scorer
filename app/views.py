@@ -64,6 +64,11 @@ def index():
             timeline_resp = twitter.request('statuses/user_timeline.json', data={ 'screen_name': user_info['screen_name']})
             if timeline_resp.status == 200:
                 tweet_temp = score_prob_star(tweets=tweet_temp, favorite_tweets=fav_resp.data, user_tweets=timeline_resp.data,criteria=criteria)
+                
+                user.last_fav_tweet_id = fav_resp.data[-1]['id_str']
+                db.session.add(user)
+                db.session.commit()
+
 
 
     return render_template('index.html', tweets=tweet_temp, user_info=user_info)
@@ -199,7 +204,7 @@ def first_login_data(user,user_info):
             if resp.status == 200:
                 temp_tweets = resp.data               
                 for tweet in temp_tweets:
-                    t = Tweets(tweet_id = tweet['id_str'], user_id = user_info['id'], created_by = tweet['user']['screen_name'], date_created=datetime.strptime(tweet['created_at'],fmt), content = json.dumps(tweet))
+                    t = Tweets(tweet_id = tweet['id_str'], user_id = user_info['id'], created_by = tweet['user']['screen_name'], date_created = datetime.strptime(tweet['created_at'],fmt), content = json.dumps(tweet))
                     db.session.add(t)
                     db.session.commit()
         else:

@@ -8,8 +8,8 @@ import json
 celery = Celery('tasks', broker='amqp://guest@localhost//')
 celery.config_from_object('celeryconfig')
 
-CONSUMER_KEY = 'tqC2q3KhStpJ14H90BqNg'
-CONSUMER_SECRET = 'c4uaYwUkpSYIvGUjCQAj80z8GcowPwtK896GN8BjM'
+CONSUMER_KEY = 'WajVXcRxH07y0ef8VMUEA'
+CONSUMER_SECRET = 'IxPzvPhWhrkJdFWdYS0wQnuhAi5D4H2puuHZjnAUkDA'
 
 
 @celery.task
@@ -49,8 +49,21 @@ def dump_tweet_job(x, y):
 
 @celery.task
 def fav_tweet_job(x,y):
+	data = {}
 	users = models.User.query.all()
 	for (index , user) in enumerate(users):
+		if user.last_fav_tweet_id != None :
+			data.update{'since_id',user.last_fav_tweet_id}
+
 		twitterHandler = Twitter(auth=OAuth(user.oauth_token, user.oauth_secret,CONSUMER_KEY, CONSUMER_SECRET))
-		tweets=twitterHandler.favorites.list()
-		print tweets;
+		tweets=twitterHandler.favorites.list(**data)
+		if len(tweets) == 0:
+			continue
+		for tweet in tweets:
+			ft = models.FavTweets(user_id = user.id, tweet_id = tweet['id_str'])
+			db.session.add(ft)
+			db.session.commit(ft)
+		user.last_fav_tweet_id = unicode(int(tweets[-1]['id_str']) - 1)
+		db.session.add(user)
+		db.session.commit()
+
