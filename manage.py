@@ -12,7 +12,7 @@ manager = Manager(app)
 def run():
     """Run in local machine."""
 
-    app.run(host='0.0.0.0',port=80,debug=True)
+    app.run(host='0.0.0.0',port=8001,debug=True)
 
 @manager.command
 def init_database():
