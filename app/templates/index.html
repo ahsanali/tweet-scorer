@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-
+<script src="{{ url_for('static', filename='js/sort.js') }}"></script>
 <div class="container" style="margin-top: 150px;">
   {% if g.user %}
     {% if tweets %}
@@ -10,8 +10,8 @@
                 </div>
 
                 <div class="col-md-8">
-                    <a href="/?score=score"><button type="button" class="pull-left btn btn-sm btn-info">Sort with inverse frequency</button></a>
-                    <a href="/?score=score2"><button type="button" style="margin-left: 20px;" class="pull-left btn btn-sm btn-info">Sort with star probabilit</button></a>
+                    <a href="#"><button onclick="tweet_sort('.inverse')" type="button" class="pull-left btn btn-sm btn-info">Sort with inverse frequency</button></a>
+                    <a href="#"><button onclick="tweet_sort('.star')" type="button" style="margin-left: 20px;" class="pull-left btn btn-sm btn-info">Sort with star probability</button></a>
                 </div>
 
                 <div class="col-md-2">
@@ -23,7 +23,7 @@
                 <div class="col-md-2">
                 </div>
 
-                <div class="col-md-8">
+                <div class="col-md-8" id ="tweet-container">
                     {% for tweet in tweets %}
                     <div class="media">
                         <a class="pull-left" href="http://twitter.com/{{ tweet.user.screen_name }}">
@@ -34,9 +34,9 @@
                             {{ tweet.text|urlize }}
                             <br />
                             <br />
-                            <div style="display:none;">
+                            <div>
                                 {% if tweet.score %}
-                                  (Tweet Score 1 : {{ tweet.score }}  Tweet Score 2: {{ tweet.score2 }}  )
+                                  (Tweet Score 1 : <span class="inverse">{{ tweet.score }}</span>  Tweet Score 2: <span class="star">{{ tweet.score2 }} </span>)
                                 {% endif %}
                             </div>
                         </div>
