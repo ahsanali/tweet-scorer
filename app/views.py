@@ -45,8 +45,11 @@ def index():
         if get_user.status == 200:
             user_info = get_user.data
         # to display in timeline
+        
+        if user.last_tweet_id is None:
+            first_login_data(user,user_info)
+
         if user.last_seen is None:
-                first_login_data(user,user_info)
                 # minus 7 days from current time
                 current_date = datetime.utcnow()
                 previous_date = current_date - timedelta(days=7)
