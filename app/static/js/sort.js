@@ -9,8 +9,8 @@ function tweet_sort(sort_class){
 
 	//Sorting Them according to provided call
 	myrow.sort(function(a,b){
-		return 	parseFloat(String($(a).find(sort_class).text()).trim()) - 
-				parseFloat(String($(b).find(sort_class).text()).trim())
+		return 	parseFloat(String($(b).find(sort_class).text()).trim()) - 
+				parseFloat(String($(a).find(sort_class).text()).trim())
 	});
 	
 	var newhtml=""
