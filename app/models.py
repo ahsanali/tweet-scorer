@@ -4,10 +4,10 @@ ROLE_USER = 0
 ROLE_ADMIN = 1
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key = True, unique= True)
+    id = db.Column(db.BIGINT, primary_key = True, unique= True)
     name = db.Column(db.String(60))
-    oauth_token = db.Column(db.String(200))
-    oauth_secret = db.Column(db.String(200))
+    oauth_token = db.Column(db.String(400))
+    oauth_secret = db.Column(db.String(400))
     last_seen = db.Column(db.DateTime)
     last_tweet_id = db.Column(db.String(100))
     last_fav_tweet_id = db.Column(db.String(100))
@@ -29,7 +29,7 @@ class User(db.Model):
 class Tweets(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     tweet_id = db.Column(db.String(100))
-    user_id = db.Column(db.Integer)
+    user_id = db.Column(db.BIGINT)
     created_by = db.Column(db.String(200))
     date_created = db.Column(db.DateTime)
     content = db.Column(db.Text)
